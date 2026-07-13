@@ -1,53 +1,60 @@
+#include <attention.h>
 #include <torch/torch.h>
-
-class attention : public torch::nn::Module{
-
-private:
-    torch::nn::Linear wq {nullptr};
-    torch::nn::Linear wk {nullptr};
-    torch::nn::Linear wv {nullptr};
-
-    torch::Tensor query, key, value, scores, mask;
-
-public:
-    attention(){
-
-        wq = register_module(
-            "wQ", 
-            torch::nn::Linear(4, 4)
-        );
-        wk = register_module(
-            "wK",
-            torch::nn::Linear(4,4)
-        );
-        wv = register_module(
-            "wV",
-            torch::nn::Linear(4,4)
-        );
-
-    }
-
-    void forward(const torch::Tensor& embeddings){
-
-        query = wq->forward(embeddings);
-        key = wk->forward(embeddings);
-        value = wv->forward(embeddings);
-
-        scores = torch::matmul(
-            query, key.transpose(0,1)
-        );
+#include <transformer-config.h>
 
 
-        mask = torch::triu(
-            torch::full({10, 11}, -INFINITY),
-            1
-        );
+attention :: attention(const std::shared_ptr<TransformerConfig>& config){
 
-        scores += mask;
-        auto attention = torch::softmax(scores, -1);
-        auto final_value = torch::matmul(attention, value);
+    wq = register_module(
+        "wQ", 
+        torch::nn::Linear(config->wq_input_dim, config->wq_output_dim)
+    );
+    wk = register_module(
+        "wK",
+        torch::nn::Linear(config->wk_input_dim, config->wk_output_dim)
+    );
+    wv = register_module(
+        "wV",
+        torch::nn::Linear(config->wv_input_dim, config->wv_output_dim)
+    );
 
-    }
+}
+
+// embedding : Tensor->shape [no_of_batch, batch_size, embedding_dim]
+// ie 
+// 2x 2x4
+// 4x2 so 2x4 x 4x2
+void attention :: forward(const torch::Tensor& embeddings){
+
+    // preserve shape
+    torch::Tensor query = wq->forward(embeddings);
+    torch::Tensor key = wk->forward(embeddings);
+    torch::Tensor value = wv->forward(embeddings);
 
 
-};
+    torch::Tensor scores = torch::matmul(
+        query, key.transpose(1,2)
+    );
+
+    // upper triangular 
+    mask = torch::triu(
+        // creates a tensor and fills with the same value
+        // @args shape, value 
+        torch::full({scores.sizes()[1], scores.sizes()[2]}, -INFINITY),
+        1
+    );
+    // [
+    //     [0 inf inf]
+    //     [0  0  inf]
+    //     [0  0   0 ]
+    // ]    
+
+    scores += mask;
+    // dimension to convert the values to probablilities -1 -> last dimension
+    torch::Tensor attention = torch::softmax(scores, -1);
+
+    torch::Tensor final_value = torch::matmul(attention, value);
+
+    std::cout<<final_value.sizes()<<std::endl<<final_value<<std::endl;
+
+}

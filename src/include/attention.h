@@ -1,4 +1,5 @@
 #include <torch/torch.h>
+#include <transformer-config.h>
 
 class attention : public torch::nn::Module{
 
@@ -7,10 +8,10 @@ private:
     torch::nn::Linear wk {nullptr};
     torch::nn::Linear wv {nullptr};
 
-    torch::Tensor query, key, value, scores, mask;
+    torch::Tensor mask;
 
 public:
-    attention(); 
+    attention(const std::shared_ptr<TransformerConfig>& config); 
     // init query, key, value
     // q k v linear(embedding_dim, total_heads x embedding_dim/total_heads)
     // return shape unkown yet to be studied
