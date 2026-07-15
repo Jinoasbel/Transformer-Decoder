@@ -1,9 +1,9 @@
 #include <attention.h>
 #include <torch/torch.h>
-#include <transformer-config.h>
+#include <transformerConfig.h>
 
 
-attention :: attention(const std::shared_ptr<TransformerConfig>& config){
+AttentionImpl :: AttentionImpl(const std::shared_ptr<TransformerConfig>& config){
 
     wq = register_module(
         "wQ", 
@@ -24,7 +24,7 @@ attention :: attention(const std::shared_ptr<TransformerConfig>& config){
 // ie 
 // 2x 2x4
 // 4x2 so 2x4 x 4x2
-void attention :: forward(const torch::Tensor& embeddings){
+torch::Tensor AttentionImpl :: forward(const torch::Tensor& embeddings){
 
     // preserve shape
     torch::Tensor query = wq->forward(embeddings);
@@ -53,8 +53,5 @@ void attention :: forward(const torch::Tensor& embeddings){
     // dimension to convert the values to probablilities -1 -> last dimension
     torch::Tensor attention = torch::softmax(scores, -1);
 
-    torch::Tensor final_value = torch::matmul(attention, value);
-
-    std::cout<<final_value.sizes()<<std::endl<<final_value<<std::endl;
-
+    return torch::matmul(attention, value);
 }

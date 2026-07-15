@@ -1,14 +1,14 @@
 #include <torch/torch.h>
 #include <memory>
-#include <transformer-config.h>
+#include <transformerConfig.h>
 
-class embedding : public torch::nn::Module{
+class EmbeddingImpl : public torch::nn::Module{
 private:
     torch::nn::Embedding embedding_model {nullptr};
 
 
 public:
-    embedding(const std::shared_ptr<TransformerConfig>& config);  
+    EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config);  
     // load embedding model if exists else create a new embedding model
 
     // input_tokens : torch.shape[no_of_batch > 0, batch_size]
@@ -16,6 +16,8 @@ public:
     // @args token_id's : Tensor @returns embeddings : Tensor
     
 };
+
+TORCH_MODULE(Embedding);
 
 // note
 // forward(input_tokens) : tensor.shape [block][row][column]

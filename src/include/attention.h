@@ -1,7 +1,7 @@
 #include <torch/torch.h>
-#include <transformer-config.h>
+#include <transformerConfig.h>
 
-class attention : public torch::nn::Module{
+class AttentionImpl : public torch::nn::Module{
 
 private:
     torch::nn::Linear wq {nullptr};
@@ -11,12 +11,12 @@ private:
     torch::Tensor mask;
 
 public:
-    attention(const std::shared_ptr<TransformerConfig>& config); 
+    AttentionImpl(const std::shared_ptr<TransformerConfig>& config); 
     // init query, key, value
     // q k v linear(embedding_dim, total_heads x embedding_dim/total_heads)
     // return shape unkown yet to be studied
 
-    void forward(const torch::Tensor& embeddings);
+    torch::Tensor forward(const torch::Tensor& embeddings);
     // @args embeddings->forward(tokens) : Tensor
     // shape to be studied
     // compute 
@@ -25,3 +25,4 @@ public:
     // softmax(scores)
     // attention x value or v
 };
+TORCH_MODULE(Attention);

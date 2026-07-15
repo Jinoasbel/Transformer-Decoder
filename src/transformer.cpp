@@ -1,29 +1,19 @@
-#include <attention.h>
-#include <embedding.h>
-#include <transformer-config.h>
-#include <torch/torch.h>
+#include <transformer.h>
 
-int main(){
+TransformerImpl :: TransformerImpl(const std::shared_ptr<TransformerConfig>& config){
 
-    std::shared_ptr<TransformerConfig> config = std::make_shared<TransformerConfig>();
-    config->embedding_dim = 4;
-    config->no_of_embeddings = 100;
-    config->wk_input_dim = 4;
-    config->wk_output_dim = 4;
-    config->wq_input_dim = 4;
-    config->wq_output_dim = 4;
-    config->wv_input_dim = 4;
-    config->wv_output_dim = 4;
-
-    embedding embedding_model = embedding(config);
-    attention attention_block = attention(config);
-
-    attention_block.forward(
-        embedding_model.forward(
-            torch::tensor({
-                {1,2,7,4,9}
-            })
-        )
-    );
-    return 0;
+    // based on the transformer config create n decoder blocks and push each of them to collection_of_decoders
+    for(int decoder = 0; decoder < config->number_of_decoders; decoder++){
+        collection_of_decoders.push_back(Decoder(config));
+    }
 }
+
+torch::Tensor TransformerImpl :: forward(const torch::Tensor& input){
+
+    torch::Tensor decoder_out = input;
+    
+    for(Decoder& decoder_i : collection_of_decoders){
+        decoder_out = decoder_i->forward(decoder_out);
+    }
+}
+
