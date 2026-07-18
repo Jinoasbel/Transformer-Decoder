@@ -1,14 +1,20 @@
 # pragma once
 #include <cstdint>
+#include <string>
 
 struct TransformerConfig{
 
-    //decoder
-    int number_of_decoders;
+
 
         // embedding specs
         int64_t embedding_dim;
         int64_t no_of_embeddings;
+
+        // positional encoding
+        std::string positional_encoder_precalculated_data_path;
+
+    //decoder
+    int number_of_decoders;
 
         // masked multihead attention specs
         int64_t wq_input_dim;
