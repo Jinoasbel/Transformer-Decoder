@@ -33,9 +33,14 @@ torch::Tensor EmbeddingImpl :: forward(torch::Tensor input_tokens){
     DEBUG("EMBEDDING FORWARD PASS");
     DEBUG(input_tokens);
     torch::Tensor embeddings = embedding_model->forward(input_tokens);
-    torch::Tensor positions = (use_pe_p)? pe->EncodePositionP(input_tokens.size(-2)) : PositionalEncoder::EncodePosition(input_tokens.size(-2), input_tokens.size(-1));
+    DEBUG("EMBEDDINGS");
+    DEBUG(embeddings);
+    torch::Tensor positions = (use_pe_p)? pe->EncodePositionP(input_tokens.size(-2)) : PositionalEncoder::EncodePosition(embeddings.size(-2), embeddings.size(-1));
     DEBUG("POSITIONS");
     DEBUG(positions);
+
+    DEBUG("EMBEDDING + POSITIONS");
+    DEBUG((embeddings + positions));
     return (embeddings + positions);
 }
 

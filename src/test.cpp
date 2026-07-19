@@ -5,6 +5,7 @@
 int main(){
 
     torch::Tensor tokens = torch::randint(30, {2,4});
+    std::cout << "INPUT TOKENS\n" << tokens << "\n\n";
     
     std::shared_ptr<TransformerConfig> config = std::make_shared<TransformerConfig>();
     
@@ -30,10 +31,15 @@ int main(){
 
     // feed forward neural network specs
     config->ffnn_hidden_layer_dim = 8;
+    try{
+        Transformer transformer = Transformer(config);
+        torch::Tensor data = transformer->forward(tokens);
+        std::cout<<data<<"\n\n";
+    }
+    catch(const std::exception& e){
+        std::cerr<<"exception\n\n"<<e.what()<<"\n";
+    }
 
-    Transformer transformer = Transformer(config);
-    torch::Tensor data = transformer->forward(tokens);
-
-    std::cout<<data<<"\n\n";
+    
 
 }
