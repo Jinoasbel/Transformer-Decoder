@@ -2,6 +2,14 @@
 #include <cstdint>
 #include <string>
 
+#define DEBUG_ENABLED true
+
+#if DEBUG_ENABLED
+#define DEBUG(x) std::cout <<x<<"\n__________________________________________________________________\n\n"
+#else
+#define DEBUG(X) 
+#endif
+
 struct TransformerConfig{
 
 
@@ -11,7 +19,9 @@ struct TransformerConfig{
         int64_t no_of_embeddings;
 
         // positional encoding
+        bool use_pre_calculated_pe;
         std::string positional_encoder_precalculated_data_path;
+        int maximum_expected_range;
 
     //decoder
     int number_of_decoders;

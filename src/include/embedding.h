@@ -1,10 +1,18 @@
+#pragma once
+
 #include <torch/torch.h>
 #include <memory>
+#include <positionalEncoder.h>
 #include <transformerConfig.h>
+
+
+
 
 class EmbeddingImpl : public torch::nn::Module{
 private:
     torch::nn::Embedding embedding_model {nullptr};
+    std::shared_ptr<PositionalEncoder> pe;
+    bool use_pe_p;
 
 
 public:

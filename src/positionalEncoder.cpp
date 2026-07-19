@@ -1,13 +1,5 @@
 #include <positionalEncoder.h>
 
- // #define DEBUG when debugging remove when release
-
-#if defined(DEBUG)
-#define DBG(x,y) std::cout<<x<<y<<"\n--------------\n";
-#else
-#define DBG(x,y) 
-#endif
-
 // expected input 
 /*
 {
@@ -37,8 +29,8 @@
 // add the pe value with the embedding
 torch::Tensor PositionalEncoder::EncodePosition(const int& y_range, const int& embedding_dim){
 
+    DEBUG("STATIC PE");
     auto y_position = torch::arange(y_range).unsqueeze(1); // makes [0,1,2,3..y_range-1] size = [y_range] or 1 dim => unsquueze(1)  [y_range, 1]
-    DBG(y_position,"YPOS")
     /*
 
     [1,2,3,4] would become
@@ -58,17 +50,14 @@ torch::Tensor PositionalEncoder::EncodePosition(const int& y_range, const int& e
     auto divisors = torch::exp(
         torch::arange(0, embedding_dim, 2) * div
     );
-    DBG(divisors,"DIV")
 
     // makes divisor so we need to only just multiply the position with divisor
     // sin(x) or cos(x) where x = y_position/divisor
     auto x = y_position / divisors;
-    DBG(x,"X")
 
     // each will be common for cos(element x positon) or sin(element x positon) 
     
     auto pe_table = torch::ones({y_range, embedding_dim});
-    DBG(pe_table,"PE")
 
     pe_table.index_put_(
         {torch::indexing::Slice(), torch::indexing::Slice(0, embedding_dim, 2)}, torch::sin(x)
@@ -79,25 +68,28 @@ torch::Tensor PositionalEncoder::EncodePosition(const int& y_range, const int& e
         {torch::indexing::Slice(), torch::indexing::Slice(1, embedding_dim, 2)}, torch::cos(x)
     );
     // put new elements over the odd dim
-    DBG(pe_table,"PE2")
+    DEBUG("PE TABLE");
+    DEBUG(pe_table);
 
     return pe_table;
 }
 
-torch::Tensor PositionalEncoder :: EncodePositionP(const int& y_range, const int& embedding_dim){
+torch::Tensor PositionalEncoder :: EncodePositionP(const int& y_range){
 
     // this will load a prebuilt position and use this for better speed
     if (pre_calculated_pe.size(-2) < y_range){
         pre_calculated_pe = PositionalEncoder::EncodePosition(y_range, embedding_dim);
         torch::save(pre_calculated_pe, parameter_path);
-    }    
+    }
+    DEBUG("PE_VALUES");    
     return pre_calculated_pe.index({torch::indexing::Slice(0, y_range), torch::indexing::Slice()});
 
 
 }
 
-PositionalEncoder :: PositionalEncoder(const std::shared_ptr<TransformerConfig>& config, int expected_range_Y) : parameter_path(config->positional_encoder_precalculated_data_path){
+PositionalEncoder :: PositionalEncoder(const std::shared_ptr<TransformerConfig>& config) : parameter_path(config->positional_encoder_precalculated_data_path), embedding_dim(config->embedding_dim){
 
+    DEBUG("PE INIT ");
     if (std::filesystem::exists(parameter_path)){     
 
         torch::load(pre_calculated_pe, parameter_path);
@@ -105,7 +97,8 @@ PositionalEncoder :: PositionalEncoder(const std::shared_ptr<TransformerConfig>&
 
     }
     else{
-        pre_calculated_pe = PositionalEncoder::EncodePosition(expected_range_Y, config->embedding_dim);
+        pre_calculated_pe = PositionalEncoder::EncodePosition(config->maximum_expected_range, config->embedding_dim);
+        DEBUG("CREATING NEW PE BECAUSE PE NOT EXIST");
         torch::save(pre_calculated_pe, parameter_path);
     }
 }

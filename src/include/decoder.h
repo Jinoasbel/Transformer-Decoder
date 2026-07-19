@@ -3,6 +3,8 @@
 #include <memory>
 #include <torch/torch.h>
 #include <feedForwardNN.h>
+#include <attention.h>
+#include <embedding.h>
 
 
 

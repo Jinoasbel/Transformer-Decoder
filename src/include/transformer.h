@@ -3,15 +3,17 @@
 #include <torch/torch.h>
 #include <transformerConfig.h>
 #include <decoder.h>
+#include <embedding.h>
 #include <vector>
 
 class TransformerImpl : torch::nn::Module{
 
 private:
     std::vector<Decoder> collection_of_decoders;
+    Embedding emb_model {nullptr};
     
 public:
     TransformerImpl(const std::shared_ptr<TransformerConfig>& config);
-    torch::Tensor forward(const torch::Tensor& input);
+    torch::Tensor forward(torch::Tensor& input);
 };
 TORCH_MODULE(Transformer);

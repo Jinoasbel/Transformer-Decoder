@@ -1,11 +1,14 @@
 #include <memory>
 #include <torch/torch.h>
 #include <transformerConfig.h>
+#include <positionalEncoder.h>
 #include <embedding.h>
 
 
-EmbeddingImpl :: EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config){
 
+EmbeddingImpl :: EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config) : use_pe_p(config->use_pre_calculated_pe){
+
+    DEBUG("INIT EMEBEDDINGS");
     embedding_model = register_module(
         "embedding_model",
         torch::nn::Embedding(
@@ -16,14 +19,24 @@ EmbeddingImpl :: EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config)
         )
 
     );
+    DEBUG("PERFORMANCE MODE");
+    DEBUG(use_pe_p);
+    if(use_pe_p){
+        pe = std::make_shared<PositionalEncoder>(config);
+    }
     
 }
 
 // input_tokens : torch.shape[no_of_batch > 0, batch_size]
 torch::Tensor EmbeddingImpl :: forward(torch::Tensor input_tokens){
 
-    // need to write positional encoder
-    return embedding_model->forward(input_tokens);
+    DEBUG("EMBEDDING FORWARD PASS");
+    DEBUG(input_tokens);
+    torch::Tensor embeddings = embedding_model->forward(input_tokens);
+    torch::Tensor positions = (use_pe_p)? pe->EncodePositionP(input_tokens.size(-2)) : PositionalEncoder::EncodePosition(input_tokens.size(-2), input_tokens.size(-1));
+    DEBUG("POSITIONS");
+    DEBUG(positions);
+    return (embeddings + positions);
 }
 
 

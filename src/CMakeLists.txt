@@ -16,9 +16,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 add_executable(
     ${CMAKE_PROJECT_NAME}
+    test.cpp
     transformer.cpp
     attention.cpp
     embedding.cpp
+    decoder.cpp
+    feedForwardNN.cpp
+    positionalEncoder.cpp
 )
 
 target_include_directories(

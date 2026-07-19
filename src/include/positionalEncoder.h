@@ -1,3 +1,5 @@
+#pragma once
+
 #include <torch/torch.h>
 #include <TransformerConfig.h>
 #include <filesystem>
@@ -32,13 +34,14 @@ class PositionalEncoder {
 
 private:
 
-    std::string parameter_path;
+    const std::string parameter_path;
     torch::Tensor pre_calculated_pe;
+    const int embedding_dim;
 
 
 public:
 
-    PositionalEncoder(const std::shared_ptr<TransformerConfig>& config, int expected_range_Y);
+    PositionalEncoder(const std::shared_ptr<TransformerConfig>& config);
 
     static torch::Tensor EncodePosition(const int& y_range, const int& embedding_dim);
 
@@ -53,7 +56,7 @@ public:
     torch::Tensor y =  x + tensor;
     */
 
-    torch::Tensor EncodePositionP(const int& y_range, const int& embedding_dim);
+    torch::Tensor EncodePositionP(const int& y_range);
     // this will load a prebuilt position and use this for better speed
     
 
