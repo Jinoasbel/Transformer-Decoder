@@ -10,7 +10,8 @@ private:
     torch::nn::Linear wk {nullptr};
     torch::nn::Linear wv {nullptr};
 
-    torch::Tensor mask;
+    torch::Tensor k_cache, v_cache;
+    int64_t dimension;
 
 public:
     AttentionImpl(const std::shared_ptr<TransformerConfig>& config); 
@@ -26,5 +27,8 @@ public:
     // scores + masks
     // softmax(scores)
     // attention x value or v
+
+    torch::Tensor forward_kv_cache(const torch::Tensor& embedding);
+    // This should recieve single embedding and updates the KV using caches and append newer values
 };
 TORCH_MODULE(Attention);

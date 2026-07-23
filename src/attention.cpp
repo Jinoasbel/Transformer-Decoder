@@ -18,6 +18,9 @@ AttentionImpl :: AttentionImpl(const std::shared_ptr<TransformerConfig>& config)
         "wV",
         torch::nn::Linear(config->wv_input_dim, config->wv_output_dim)
     );
+
+    dimension = config->embedding_dim;
+
     DEBUG("ATTENTION INITIATED");
 
 }
@@ -38,18 +41,19 @@ torch::Tensor AttentionImpl :: forward(const torch::Tensor& embeddings){
     DEBUG("KEY");
     DEBUG(key);
     torch::Tensor value = wv->forward(embeddings);
-    DEBUG("VALUE");
+    DEBUG("VALUE");    
     DEBUG(value);
 
     torch::Tensor scores = torch::matmul(
         query, key.transpose(1,2)
     );
+    scores = scores / std::sqrt(dimension);
     DEBUG("SCORES");
     DEBUG(scores);
 
     // upper triangular
     DEBUG("MASK"); 
-    mask = torch::triu(
+    torch::Tensor mask = torch::triu(
         // creates a tensor and fills with the same value
         // @args shape, value 
         torch::full({scores.sizes()[1], scores.sizes()[2]}, -INFINITY),
@@ -71,6 +75,51 @@ torch::Tensor AttentionImpl :: forward(const torch::Tensor& embeddings){
     DEBUG(attention);
 
     DEBUG("ATTENTION X VALUE");
+    // attention will be added at the decoder block
     DEBUG(torch::matmul(attention, value));
     return torch::matmul(attention, value);
+}
+
+torch::Tensor AttentionImpl :: forward_kv_cache(const torch::Tensor& embedding){
+
+    DEBUG("ATTENTION FORWARD PASS (KV ENABLED)");
+    
+    if(embedding.size(-2) > 1){
+        DEBUG("INPUT DIM INCOMPATIBLE");
+        throw std::runtime_error("incompatibe embedding input in forward");
+    }
+
+    torch::Tensor query = wq->forward(embedding);
+    DEBUG("QUERY");
+    DEBUG(query);
+    torch::Tensor key = wk->forward(embedding);
+    DEBUG("KEY");
+    DEBUG(key);
+    k_cache = torch::cat({k_cache, key}, 0);
+    DEBUG("K CACHE");
+    DEBUG(k_cache);
+    torch::Tensor value = wv->forward(embedding);
+    DEBUG("VALUE");    
+    DEBUG(value);
+    v_cache = torch::cat({v_cache, value}, 0);
+    DEBUG("V CACHE");
+    DEBUG(v_cache);
+
+    torch::Tensor scores = torch::matmul(
+        query, k_cache.transpose(1, 2)
+    );
+
+    scores = scores / std::sqrt(dimension);
+    DEBUG("SCORES");
+    DEBUG(scores);
+
+    torch::Tensor attention = torch::softmax(scores, -1);
+    DEBUG("ATTENTION");
+    DEBUG(attention);
+
+    DEBUG("ATTENTION X VALUE");
+    // attention will be added at the decoder block
+    DEBUG(torch::matmul(attention, value));
+    return torch::matmul(attention, v_cache);
+
 }
