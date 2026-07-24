@@ -1,7 +1,7 @@
 #pragma once
 
 #include <torch/torch.h>
-#include <TransformerConfig.h>
+#include <transformerConfig.h>
 #include <filesystem>
 #include <stdexcept>
 

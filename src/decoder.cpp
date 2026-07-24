@@ -30,22 +30,26 @@ torch::Tensor DecoderImpl::forward(const torch::Tensor& input_tensor){
 
     DEBUG("DECODER FORWARD PASS");
     DEBUG(input_tensor);
-    // attention block
+
     torch::Tensor attention_output = attention_block->forward(input_tensor);
     DEBUG("ATTENTION OUT");
     DEBUG(attention_output);
+
     //residual add
     torch::Tensor residual_add = torch::add(input_tensor, attention_output);
     DEBUG("RESIDUAL ADD");
     DEBUG(residual_add);
+
     //layer normalization
     torch::Tensor normalized_val = normalization_block(residual_add);
     DEBUG("NORMALIZATION");
     DEBUG(normalized_val);
+
     //feed forward neural network
     torch::Tensor ffnn_output = ffnn(normalized_val);
     DEBUG("FEED FORWARD NEURAL NETWORK");
     DEBUG(ffnn_output);
+    
     //add residual
     return torch::add(input_tensor, ffnn_output);
 

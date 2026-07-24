@@ -13,6 +13,7 @@
 struct TransformerConfig{
 
     // Transformer configuration or settings
+    bool is_training_enabled; // 0 if inference 1 if training 
 
         // embedding block
             // embedding specs
@@ -34,6 +35,9 @@ struct TransformerConfig{
                     int64_t wk_output_dim;
                     int64_t wv_input_dim;
                     int64_t wv_output_dim;
+
+                // kv cache
+                    bool use_kv_cache;
 
 
                 // feed forward neural network specs

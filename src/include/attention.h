@@ -11,7 +11,8 @@ private:
     torch::nn::Linear wv {nullptr};
 
     torch::Tensor k_cache, v_cache;
-    int64_t dimension;
+
+    bool mode, use_kv_cache;
 
 public:
     AttentionImpl(const std::shared_ptr<TransformerConfig>& config); 
@@ -27,6 +28,8 @@ public:
     // scores + masks
     // softmax(scores)
     // attention x value or v
+
+    // if kv cache enabled then the dim must be [batch, 1, dim]
 
     torch::Tensor forward_kv_cache(const torch::Tensor& embedding);
     // This should recieve single embedding and updates the KV using caches and append newer values
