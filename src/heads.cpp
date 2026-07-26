@@ -21,7 +21,7 @@ torch::Tensor HeadsImpl :: forward(const torch::Tensor& input){
 
     torch::Tensor index = predictions.select(1, predictions.size(1)-1);
     index = index.argmax(-1);
-    DEBUG("INDEX");
+    DEBUG("PREDICTED TOKEN");
     DEBUG(index);
     return index;
 

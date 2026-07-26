@@ -62,11 +62,13 @@ torch::Tensor AttentionImpl :: forward(const torch::Tensor& embeddings){
             // if kv cache is enabled 
             DEBUG("KV CACHE ENABLED");
             if(!k_cache.defined()){
-                k_cache = torch::empty(key.sizes());
-                v_cache = torch::empty(value.sizes());
+                k_cache = key;
+                v_cache = value;
             }
-            k_cache = torch::cat({k_cache, key}, 0);
-            v_cache = torch::cat({v_cache, value}, 0);
+            else {
+                k_cache = torch::cat({k_cache, key}, 0);
+                v_cache = torch::cat({v_cache, value}, 0);
+            }
 
             DEBUG("NEW KV CACHE");
             DEBUG(k_cache);
