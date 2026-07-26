@@ -5,7 +5,8 @@ TransformerImpl :: TransformerImpl(const std::shared_ptr<TransformerConfig>& con
     DEBUG(config->number_of_decoders);
     emb_model = register_module(
         "embedding_model", Embedding(config)
-    ); 
+    );
+
 
     // based on the transformer config create n decoder blocks and push each of them to collection_of_decoders
     for(int decoder = 0; decoder < config->number_of_decoders; decoder++){
@@ -17,6 +18,12 @@ TransformerImpl :: TransformerImpl(const std::shared_ptr<TransformerConfig>& con
         );
         DEBUG("DECODER INIT");
     }
+
+    DEBUG("INIT PREDICTION HEADS");
+    prediction_heads = register_module(
+        "prediction heads",
+        Heads(config)
+    );
     
 }
 
@@ -37,6 +44,9 @@ torch::Tensor TransformerImpl :: forward(torch::Tensor& input){
     DEBUG("OUTPUT");
     DEBUG(embeddings);
 
+    embeddings = prediction_heads->forward(embeddings);
+    DEBUG("INDEX");
+    DEBUG(embeddings);
     return embeddings;
 
 }

@@ -31,7 +31,7 @@ public:
 
     // if kv cache enabled then the dim must be [batch, 1, dim]
 
-    torch::Tensor forward_kv_cache(const torch::Tensor& embedding);
+    // torch::Tensor forward_kv_cache(const torch::Tensor& embedding);
     // This should recieve single embedding and updates the KV using caches and append newer values
 };
 TORCH_MODULE(Attention);

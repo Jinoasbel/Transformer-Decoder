@@ -9,9 +9,10 @@ int main(){
     
     std::shared_ptr<TransformerConfig> config = std::make_shared<TransformerConfig>();
     
+    config->is_training_enabled = false;
     // embedding specs
     config->embedding_dim = 4;
-    config->no_of_embeddings = 40;
+    config->no_of_embeddings = 100;
 
     // positional encoding
     config->use_pre_calculated_pe = false;
@@ -29,7 +30,11 @@ int main(){
     config->wv_input_dim = 4;
     config->wv_output_dim = 4;
 
+    config->use_kv_cache = true;
     // feed forward neural network specs
+    config->prediction_head_input = 4;
+    config->prediction_head_output = 100;
+    config->batch_size = 1;
     config->ffnn_hidden_layer_dim = 8;
     try{
         Transformer transformer = Transformer(config);

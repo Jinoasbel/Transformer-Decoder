@@ -47,6 +47,7 @@ torch::Tensor AttentionImpl :: forward(const torch::Tensor& embeddings){
     DEBUG("VALUE");    
     DEBUG(value);
 
+    
     // mode : inference or training, 0 for inference 1 for training
     if(!mode){ // if not inference
         DEBUG("INFERENCE");
@@ -60,6 +61,10 @@ torch::Tensor AttentionImpl :: forward(const torch::Tensor& embeddings){
             }
             // if kv cache is enabled 
             DEBUG("KV CACHE ENABLED");
+            if(!k_cache.defined()){
+                k_cache = torch::empty(key.sizes());
+                v_cache = torch::empty(value.sizes());
+            }
             k_cache = torch::cat({k_cache, key}, 0);
             v_cache = torch::cat({v_cache, value}, 0);
 

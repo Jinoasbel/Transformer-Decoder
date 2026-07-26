@@ -23,6 +23,7 @@ add_executable(
     decoder.cpp
     feedForwardNN.cpp
     positionalEncoder.cpp
+    heads.cpp
 )
 
 target_include_directories(

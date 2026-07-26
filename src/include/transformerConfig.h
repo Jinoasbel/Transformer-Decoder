@@ -13,6 +13,7 @@
 struct TransformerConfig{
 
     // Transformer configuration or settings
+    int64_t batch_size;
     bool is_training_enabled; // 0 if inference 1 if training 
 
         // embedding block
@@ -43,6 +44,9 @@ struct TransformerConfig{
                 // feed forward neural network specs
                 int64_t ffnn_hidden_layer_dim;
 
+        // prediction heads
+            int64_t prediction_head_input;
+            int64_t prediction_head_output;
     
     
 };
