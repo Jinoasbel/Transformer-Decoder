@@ -28,6 +28,10 @@ EmbeddingImpl :: EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config)
 }
 
 // input_tokens : torch.shape[no_of_batch > 0, batch_size]
+
+// if input.sizes -> [a, b]
+// returns [a, b, embedding dimension]
+
 torch::Tensor EmbeddingImpl :: forward(torch::Tensor input_tokens){
 
     DEBUG("EMBEDDING FORWARD PASS");
@@ -43,6 +47,11 @@ torch::Tensor EmbeddingImpl :: forward(torch::Tensor input_tokens){
     DEBUG((embeddings + positions));
     return (embeddings + positions);
 }
+
+// 1 x 1 -> embedding -> 1 x 1 x 4 
+// {
+//     {a, b, c, d}
+// }
 
 
 
