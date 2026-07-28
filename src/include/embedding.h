@@ -20,7 +20,7 @@ public:
     // load embedding model if exists else create a new embedding model
 
     // input_tokens : torch.shape[no_of_batch > 0, batch_size]
-    torch::Tensor forward(torch::Tensor input_tokens);  
+    torch::Tensor forward(torch::Tensor input_tokens, int token_no);  
     // @args token_id's : Tensor @returns embeddings : Tensor
     
 };

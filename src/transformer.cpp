@@ -28,13 +28,14 @@ TransformerImpl :: TransformerImpl(const std::shared_ptr<TransformerConfig>& con
 }
 
 // 1 x 1
-torch::Tensor TransformerImpl :: forward(torch::Tensor& input){
+torch::Tensor TransformerImpl :: forward(torch::Tensor& input, int token_no){
 
     DEBUG("INPUT TOKEN");
     DEBUG(input);
 
+
     DEBUG("EMBEDDINGS");
-    torch::Tensor embeddings = emb_model->forward(input);
+    torch::Tensor embeddings = emb_model->forward(input, token_no);
     DEBUG(embeddings);
     DEBUG("DIMENSION OF EMBEDDING OUTPUT");
     DEBUG(embeddings.sizes());

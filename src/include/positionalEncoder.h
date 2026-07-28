@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <torch/torch.h>
 #include <transformerConfig.h>
 #include <filesystem>
@@ -43,7 +44,7 @@ public:
 
     PositionalEncoder(const std::shared_ptr<TransformerConfig>& config);
 
-    static torch::Tensor EncodePosition(const int& y_range, const int& embedding_dim);
+    static torch::Tensor EncodePosition(const int& y_range, const int& embedding_dim, int token_no);
 
     // example usage
     /*

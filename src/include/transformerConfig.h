@@ -1,11 +1,13 @@
 # pragma once
 #include <cstdint>
 #include <string>
+#include <fstream>
 
 #define DEBUG_ENABLED true
 
 #if DEBUG_ENABLED
 #define DEBUG(x) std::cout <<x<<"\n__________________________________________________________________\n\n"
+
 #else
 #define DEBUG(X) 
 #endif

@@ -32,15 +32,20 @@ EmbeddingImpl :: EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config)
 // if input.sizes -> [a, b]
 // returns [a, b, embedding dimension]
 
-torch::Tensor EmbeddingImpl :: forward(torch::Tensor input_tokens){
+torch::Tensor EmbeddingImpl :: forward(torch::Tensor input_tokens, int token_no){
 
     DEBUG("EMBEDDING FORWARD PASS");
     DEBUG(input_tokens);
+    DEBUG("POSITION");
+    DEBUG(input_tokens.size(-1));
+
     torch::Tensor embeddings = embedding_model->forward(input_tokens);
     DEBUG("EMBEDDINGS");
     DEBUG(embeddings);
-    torch::Tensor positions = (use_pe_p)? pe->EncodePositionP(input_tokens.size(-2)) : PositionalEncoder::EncodePosition(embeddings.size(-2), embeddings.size(-1));
+
+    torch::Tensor positions = (use_pe_p)? pe->EncodePositionP(input_tokens.size(-2)) : PositionalEncoder::EncodePosition(embeddings.size(-2), embeddings.size(-1), token_no);
     DEBUG("POSITIONS");
+
     DEBUG(positions);
 
     DEBUG("EMBEDDING + POSITIONS");
