@@ -44,7 +44,7 @@ public:
 
     PositionalEncoder(const std::shared_ptr<TransformerConfig>& config);
 
-    static torch::Tensor EncodePosition(const int& y_range, const int& embedding_dim, int token_no);
+    static torch::Tensor EncodePosition(const int& y_range, const int& embedding_dim, int token_no = 0);
 
     // example usage
     /*
