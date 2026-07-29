@@ -49,27 +49,17 @@ torch::Tensor AttentionImpl :: forward(const torch::Tensor& embeddings){
 
     
     // mode : inference or training, 0 for inference 1 for training
-    if(!mode){ // if not inference
+    if(!mode){
         DEBUG("INFERENCE");
 
         if(use_kv_cache){
 
-            // takes a batch [batch_size, 1, dimension]
-            // if(embeddings.size(1) == 1){
-            //     DEBUG("INPUT DIM INCOMPATIBLE");
-            //     throw std::runtime_error("incompatibe embedding input in forward");
-            // }
-            // if kv cache is enabled 
             DEBUG("KV CACHE ENABLED");
             if(!k_cache.defined()){
-
-                // 1 x 1 x 4
                 k_cache = key;
                 v_cache = value;
             }
             else {
-
-                // 1 x 1 x 4 + 1 x 1 x 4 @1 -> 1 x 2 x 4
                 k_cache = torch::cat({k_cache, key}, 1);
                 v_cache = torch::cat({v_cache, value}, 1);
             }
@@ -129,7 +119,3 @@ torch::Tensor AttentionImpl :: forward(const torch::Tensor& embeddings){
     DEBUG(torch::matmul(attention, value));
     return torch::matmul(attention, value);
 }
-
-// 1 x 1 x 2 * 1 x 1 x 4
-
-// [1 2] x [1 2 3 4]

@@ -21,7 +21,7 @@ EmbeddingImpl :: EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config)
     
 }
 
-
+// 1 x 1 -> embedding -> 1 x 1 x 4 
 torch::Tensor EmbeddingImpl :: forward(torch::Tensor tokens){
 
     // objective 
@@ -33,14 +33,11 @@ torch::Tensor EmbeddingImpl :: forward(torch::Tensor tokens){
     torch::Tensor embeddings = embedding_model->forward(tokens);
     DEBUG("EMBEDDINGS");
     DEBUG(embeddings);
-
     return embeddings;
 }
 
-// 1 x 1 -> embedding -> 1 x 1 x 4 
-// {
-//     {a, b, c, d}
-// }
+
+
 
 
 
