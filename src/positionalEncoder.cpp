@@ -45,94 +45,42 @@
 
 // objective: The implementation should be efficient 
 
-// returns the positional encoding table 
-// add the pe value with the embedding
+/*
+    if token_no = 0
+    return pe of size no_of_tokens X embedding_dim
+
+    else 
+    return pe of size 1 X embedding_dim
+*/
 torch::Tensor PositionalEncoder::EncodePosition(const int& no_of_tokens, const int& embedding_dim, int token_no){
 
+    torch::Tensor position;
+    torch::Tensor pos_div;
+    torch::Tensor pe_table;
+
     DEBUG("STATIC PE");
-
-    token_no--;
-    if(token_no > 0){
-        
-        auto position = torch::tensor({token_no}).unsqueeze(1);
-        auto div = -std::log(10000)/embedding_dim;
-
-        DEBUG("PE INFERENCE MODE");
-        DEBUG(position);
-
-        auto divisors = torch::exp(
-            torch::arange(0, embedding_dim, 2) * div
-        ); // e.[0, 2, 4,.., 2n] * div
-
-        DEBUG("DIVISORS");
-        DEBUG(divisors);
-
-        auto x = position * divisors;
-        DEBUG("X");
-        DEBUG(x);
-    
-        auto pe_table = torch::ones({embedding_dim}).unsqueeze(0);
-        DEBUG("ONES TABLE");
-        DEBUG(pe_table);
-
-        pe_table.index_put_(
-            {torch::indexing::Slice(), torch::indexing::Slice(0, embedding_dim, 2)}, torch::sin(x)
-        );
-        pe_table.index_put_(
-            {torch::indexing::Slice(), torch::indexing::Slice(1, embedding_dim, 2)}, torch::cos(x)
-        );
-
-        DEBUG("PE TABLE");
-        DEBUG(pe_table);
-
-        std::cout<<"END \n";
-
-        return pe_table;
-    }
-    auto y_position = torch::arange(no_of_tokens).unsqueeze(1); // makes [0,1,2,3..no_of_tokens-1] size = [no_of_tokens] or 1 dim => unsquueze(1)  [no_of_tokens, 1]
-    /*
-
-    [1,2,3,4] would become
-
-    [
-        [1]
-        [2]
-        [3]
-        [4]
-    ]
-
-    */
-   // e−(2i/d)ln(10000)=e(2i)(d−ln(10000)​)
-
-
-
-   auto div = -std::log(10000)/embedding_dim;
-
+    auto div = -std::log(10000)/embedding_dim;
     auto divisors = torch::exp(
         torch::arange(0, embedding_dim, 2) * div
     );
 
-    // makes divisor so we need to only just multiply the position with divisor
-    // sin(x) or cos(x) where x = y_position/divisor
-    auto x = y_position * divisors;
+    token_no--;
 
-    // each will be common for cos(element x positon) or sin(element x positon) 
-    
-    auto pe_table = torch::ones({no_of_tokens, embedding_dim});
+    position = (token_no > 0)? torch::tensor({token_no}).unsqueeze(1) : torch::arange(no_of_tokens).unsqueeze(1);
+    pe_table = (token_no > 0)? torch::ones({embedding_dim}).unsqueeze(0) : torch::ones({no_of_tokens, embedding_dim});
 
-    pe_table.index_put_(
-        {torch::indexing::Slice(), torch::indexing::Slice(0, embedding_dim, 2)}, torch::sin(x)
-    );
-    // put new elements over the even dim
+    pos_div = position * divisors;
 
     pe_table.index_put_(
-        {torch::indexing::Slice(), torch::indexing::Slice(1, embedding_dim, 2)}, torch::cos(x)
+        {torch::indexing::Slice(), torch::indexing::Slice(0, embedding_dim, 2)}, torch::sin(pos_div)
     );
-    // put new elements over the odd dim
+    pe_table.index_put_(
+        {torch::indexing::Slice(), torch::indexing::Slice(1, embedding_dim, 2)}, torch::cos(pos_div)
+    );
     DEBUG("PE TABLE");
     DEBUG(pe_table);
-
     return pe_table;
+
 }
 
 torch::Tensor PositionalEncoder :: EncodePositionP(const int& no_of_tokens){
