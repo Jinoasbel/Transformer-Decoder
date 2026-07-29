@@ -6,7 +6,7 @@
 
 
 
-EmbeddingImpl :: EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config) : use_pe_p(config->use_pre_calculated_pe){
+EmbeddingImpl :: EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config){
 
     DEBUG("INIT EMEBEDDINGS");
     embedding_model = register_module(
@@ -17,40 +17,24 @@ EmbeddingImpl :: EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config)
                 config->embedding_dim
             )
         )
-
     );
-    DEBUG("PERFORMANCE MODE");
-    DEBUG(use_pe_p);
-    if(use_pe_p){
-        pe = std::make_shared<PositionalEncoder>(config);
-    }
     
 }
 
-// input_tokens : torch.shape[no_of_batch > 0, batch_size]
 
-// if input.sizes -> [a, b]
-// returns [a, b, embedding dimension]
+torch::Tensor EmbeddingImpl :: forward(torch::Tensor tokens){
 
-torch::Tensor EmbeddingImpl :: forward(torch::Tensor input_tokens, int token_no){
+    // objective 
+    // should take a sequence or a single token and returns their embeddings
 
     DEBUG("EMBEDDING FORWARD PASS");
-    DEBUG(input_tokens);
-    DEBUG("POSITION");
-    DEBUG(input_tokens.size(-1));
-
-    torch::Tensor embeddings = embedding_model->forward(input_tokens);
+    DEBUG("EMBEDDING INPUT TOKENS");
+    DEBUG(tokens);
+    torch::Tensor embeddings = embedding_model->forward(tokens);
     DEBUG("EMBEDDINGS");
     DEBUG(embeddings);
 
-    torch::Tensor positions = (use_pe_p)? pe->EncodePositionP(input_tokens.size(-2)) : PositionalEncoder::EncodePosition(embeddings.size(-2), embeddings.size(-1), token_no);
-    DEBUG("POSITIONS");
-
-    DEBUG(positions);
-
-    DEBUG("EMBEDDING + POSITIONS");
-    DEBUG((embeddings + positions));
-    return (embeddings + positions);
+    return embeddings;
 }
 
 // 1 x 1 -> embedding -> 1 x 1 x 4 
