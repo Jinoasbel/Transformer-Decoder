@@ -3,6 +3,10 @@
 #include <torch/torch.h>
 #include <transformerConfig.h>
 
+
+/**
+ * @brief Attention Implementation of the transformer architecture, Initiates q k v(query key value) three linear layer weights are combined to improve performance, with a k v cache mechanism which works on inference and can be switched based on the needs
+ */
 class AttentionImpl : public torch::nn::Module{
 
 private:
@@ -15,23 +19,23 @@ private:
     bool mode, use_kv_cache;
 
 public:
+
+    /**
+     * @param ``shared_ptr<TransformerConfig> config ``
+     * @pre ``config->wq_input_dim, config->wq_output_dim, config->is_training_enabled, config->use_kv_cache``
+     */
     AttentionImpl(const std::shared_ptr<TransformerConfig>& config); 
-    // init query, key, value
-    // q k v linear(embedding_dim, total_heads x embedding_dim/total_heads)
-    // return shape unkown yet to be studied
+    
 
+    /**
+     * @brief compute query key value with or without using kv cache 
+     * @pre requires embeddings to be positionally encoded
+     * @warning input embedding size must be 3
+     * @param ``torch::Tensor embedding``
+     * @returns ``attention x value``
+     * 
+     */
     torch::Tensor forward(const torch::Tensor& embeddings);
-    // @args embeddings->forward(tokens) : Tensor
-    // shape to be studied
-    // compute 
-    // q, k, v
-    // scores + masks
-    // softmax(scores)
-    // attention x value or v
 
-    // if kv cache enabled then the dim must be [batch, 1, dim]
-
-    // torch::Tensor forward_kv_cache(const torch::Tensor& embedding);
-    // This should recieve single embedding and updates the KV using caches and append newer values
 };
 TORCH_MODULE(Attention);

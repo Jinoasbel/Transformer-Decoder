@@ -32,7 +32,12 @@ private:
 
 public:
 
-    
+    /**
+     * @brief Initialize PositionalEncoder object
+     * @param ``std::shared_ptr<TransformerConfig>``
+     * @note ``config->pe_data_path`` saved PositionalEncoded tensor path
+     * ``config->embedding_dim`` dimension of the saved tensor 
+     */
     PositionalEncoder(const std::shared_ptr<TransformerConfig>& config);
 
     /**
@@ -68,6 +73,7 @@ public:
     static torch::Tensor EncodePosition(const int& no_of_tokens, const int& embedding_dim, int token_no = 0);
 
     /**
+     * @brief Retrives Positional encoding data from pre calculated positional tensors
      * @todo Test, Reconstruct an object oriented performance oriented version of the positional encoder
      */
     torch::Tensor EncodePositionP(const int& no_of_tokens = 0, int token_no = 0);

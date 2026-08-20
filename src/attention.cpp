@@ -1,6 +1,4 @@
 #include <attention.h>
-#include <torch/torch.h>
-#include <transformerConfig.h>
 
 
 AttentionImpl :: AttentionImpl(const std::shared_ptr<TransformerConfig>& config){
@@ -33,6 +31,7 @@ AttentionImpl :: AttentionImpl(const std::shared_ptr<TransformerConfig>& config)
 torch::Tensor AttentionImpl :: forward(const torch::Tensor& embeddings){
 
 
+    TORCH_CHECK(embeddings.dim()==3, "Embedding dimension must be 3");
     DEBUG("ATTENTION FORWARD PASS");
     torch::Tensor scores;
 
@@ -115,7 +114,7 @@ torch::Tensor AttentionImpl :: forward(const torch::Tensor& embeddings){
     DEBUG(attention);
 
     DEBUG("ATTENTION X VALUE");
-    // funal attention output
+    // final attention output
     DEBUG(torch::matmul(attention, value));
     return torch::matmul(attention, value);
 }

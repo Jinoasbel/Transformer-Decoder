@@ -18,8 +18,9 @@ PositionalEncoder :: PositionalEncoder(const std::shared_ptr<TransformerConfig>&
 
 
 
-
 torch::Tensor PositionalEncoder::EncodePosition(const int& no_of_tokens, const int& embedding_dim, int token_no){
+
+    TORCH_CHECK(embedding_dim % 2 == 0, "Embedding Dimension must be Even");
 
     torch::Tensor position;
     torch::Tensor pos_div;
@@ -33,8 +34,9 @@ torch::Tensor PositionalEncoder::EncodePosition(const int& no_of_tokens, const i
 
     token_no--;
 
-    position = (token_no > 0)? torch::tensor({token_no}).unsqueeze(1) : torch::arange(no_of_tokens).unsqueeze(1);
-    pe_table = (token_no > 0)? torch::ones({embedding_dim}).unsqueeze(0) : torch::ones({no_of_tokens, embedding_dim});
+    position = (token_no > 0)? torch::tensor({token_no}).unsqueeze(1) : torch::arange(no_of_tokens).unsqueeze(1); // 3x1
+
+    pe_table = (token_no > 0)? torch::ones({embedding_dim}).unsqueeze(0) : torch::ones({no_of_tokens, embedding_dim}); // 3x3
 
     pos_div = position * divisors;
 
@@ -50,6 +52,7 @@ torch::Tensor PositionalEncoder::EncodePosition(const int& no_of_tokens, const i
 
 }
 
+// note drop the Object based idea and just keep the static implementation
 torch::Tensor PositionalEncoder :: EncodePositionP(const int& no_of_tokens, int token_no){
 
     token_no--;

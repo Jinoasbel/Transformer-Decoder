@@ -1,7 +1,3 @@
-#include <memory>
-#include <torch/torch.h>
-#include <transformerConfig.h>
-#include <positionalEncoder.h>
 #include <embedding.h>
 
 
@@ -21,11 +17,7 @@ EmbeddingImpl :: EmbeddingImpl(const std::shared_ptr<TransformerConfig>& config)
     
 }
 
-// 1 x 1 -> embedding -> 1 x 1 x 4 
 torch::Tensor EmbeddingImpl :: forward(torch::Tensor tokens){
-
-    // objective 
-    // should take a sequence or a single token and returns their embeddings
 
     DEBUG("EMBEDDING FORWARD PASS");
     DEBUG("EMBEDDING INPUT TOKENS");

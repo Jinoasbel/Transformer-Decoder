@@ -2,6 +2,9 @@
 #include <torch/torch.h>
 #include <transformerConfig.h>
 
+/**
+ * @brief Neural Network with one hidden layer. The input tensor will be expanded then shrunk to the size of embedding dimension
+ */
 class FeedForwardNeuralNetworkImpl : public torch::nn::Module{
 private:
     torch::nn::Linear layer1 {nullptr};

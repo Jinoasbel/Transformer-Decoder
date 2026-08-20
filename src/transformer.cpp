@@ -27,7 +27,7 @@ TransformerImpl :: TransformerImpl(const std::shared_ptr<TransformerConfig>& con
     
 }
 
-// 1 x 1
+// note transformer should be the orator and should manage every components
 torch::Tensor TransformerImpl :: forward(torch::Tensor& input, int token_no){
 
     DEBUG("INPUT TOKEN");
@@ -41,6 +41,8 @@ torch::Tensor TransformerImpl :: forward(torch::Tensor& input, int token_no){
     DEBUG(embeddings.sizes());
     
     DEBUG("FORWARD"); 
+
+    // check whether torch can track vector<Tensors>
     for(Decoder& decoder_i : collection_of_decoders){
         embeddings = decoder_i->forward(embeddings);
     }
