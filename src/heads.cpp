@@ -35,18 +35,22 @@ torch::Tensor HeadsImpl :: forward(torch::Tensor& input){
     // 2 x 1 x 100
     // torch::Tensor index = predictions.select(1, predictions.size(1)-1);
 
+    // returning the predicted token is not ideal
+    // This should return the entire logits rather than a single token
 
-    torch::Tensor index = predictions.argmax(-1); // 2 X 1 
+    return predictions;
 
+    // torch::Tensor index = predictions.argmax(-1); // 2 X 1 
+
+    
+    // DEBUG("PREDICTED TOKEN");
+    // DEBUG(index);
+    // return index;
+    
     // {
     //     {x}
     //     {y}
     // }
-
-    DEBUG("PREDICTED TOKEN");
-    DEBUG(index);
-    return index;
-
 }
 
 /**
