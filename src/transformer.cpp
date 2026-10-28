@@ -1,21 +1,19 @@
 #include <transformer.h>
 
-TransformerImpl :: TransformerImpl(const std::shared_ptr<TransformerConfig>& config){
+TransformerImpl ::TransformerImpl(const std::shared_ptr<TransformerConfig> &config)
+{
 
     DEBUG(config->number_of_decoders);
     emb_model = register_module(
         "embedding_model", Embedding(config)
     );
 
-
     // based on the transformer config create n decoder blocks and push each of them to collection_of_decoders
-    for(int decoder = 0; decoder < config->number_of_decoders; decoder++){
-
+    for (int decoder = 0; decoder < config->number_of_decoders; decoder++)
+    {
         collection_of_decoders.push_back(
             register_module(
-                "decoder_"+ std::to_string(decoder), Decoder(config)
-            )
-        );
+                "decoder_" + std::to_string(decoder), Decoder(config)));
         DEBUG("DECODER INIT");
     }
 
@@ -24,36 +22,38 @@ TransformerImpl :: TransformerImpl(const std::shared_ptr<TransformerConfig>& con
         "prediction heads",
         Heads(config)
     );
-    
 }
 
 // note transformer should be the orator and should manage every components
-torch::Tensor TransformerImpl :: forward(torch::Tensor& input, int token_no){
+torch::Tensor TransformerImpl :: forward(torch::Tensor& input, int token_no)
+{
 
     DEBUG("INPUT TOKEN");
     DEBUG(input);
 
-
     DEBUG("EMBEDDINGS");
-    torch::Tensor embeddings = emb_model->forward(input, token_no);
+    torch::Tensor embeddings = emb_model->forward(input);
+    auto embedding_withpos = embeddings + PositionalEncoder::EncodePosition(embeddings.size(-2), embeddings.size(-1), token_no);
     DEBUG(embeddings);
     DEBUG("DIMENSION OF EMBEDDING OUTPUT");
     DEBUG(embeddings.sizes());
-    
-    DEBUG("FORWARD"); 
+
+    DEBUG("FORWARD");
 
     // check whether torch can track vector<Tensors>
-    for(Decoder& decoder_i : collection_of_decoders){
+    for (Decoder &decoder_i : collection_of_decoders)
+    {
         embeddings = decoder_i->forward(embeddings);
     }
 
     DEBUG("OUTPUT");
     DEBUG(embeddings);
+    DEBUG(embeddings.sizes());
 
-    embeddings = prediction_heads->forward(embeddings);
-    DEBUG("INDEX");
-    DEBUG(embeddings);
-    return embeddings;
+    auto prediction = prediction_heads->forward(embeddings);
 
+    DEBUG("PREDICTION");
+    DEBUG(prediction);
+
+    return prediction;
 }
-

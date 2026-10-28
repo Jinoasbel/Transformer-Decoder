@@ -2,6 +2,7 @@
 
 #include <torch/torch.h>
 #include <transformerConfig.h>
+#include <positionalEncoder.h>
 #include <decoder.h>
 #include <embedding.h>
 #include <heads.h>

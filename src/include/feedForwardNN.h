@@ -4,6 +4,7 @@
 
 /**
  * @brief Neural Network with one hidden layer. The input tensor will be expanded then shrunk to the size of embedding dimension
+ * @note dynamic initialization of number of layers in feed forward neural network is needed
  */
 class FeedForwardNeuralNetworkImpl : public torch::nn::Module{
 private:

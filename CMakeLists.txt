@@ -1,0 +1,91 @@
+cmake_minimum_required (VERSION 3.20 )
+project (TRANSFORMER VERSION 0.1 LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+list(APPEND CMAKE_PREFIX_PATH "D:/Library/libtorch")
+set(DEPENDENCY_PATH "D:/Library/libtorch/lib")
+
+find_package(
+    torch
+    REQUIRED
+)
+
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+
+add_library(
+    src_transformer
+    src/transformer.cpp
+    src/embedding.cpp
+    src/positionalEncoder.cpp
+    src/decoder.cpp
+    src/feedForwardNN.cpp
+    src/attention.cpp
+    src/heads.cpp
+)
+
+# add_executable(
+#     ${CMAKE_PROJECT_NAME}
+#     test.cpp
+#     transformer.cpp
+#     embedding.cpp
+#     positionalEncoder.cpp
+#     decoder.cpp
+#     feedForwardNN.cpp
+#     attention.cpp
+# )
+
+add_executable(
+    ${CMAKE_PROJECT_NAME}
+    test/transformer_config_test.cpp
+)
+
+target_include_directories(
+    ${CMAKE_PROJECT_NAME}
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
+    ${TORCH_INCLUDE_DIRS}
+)
+
+target_include_directories(
+    # ${CMAKE_PROJECT_NAME}
+    src_transformer
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/include
+    ${TORCH_INCLUDE_DIRS}
+)
+
+target_link_libraries(
+    ${CMAKE_PROJECT_NAME}
+    PRIVATE 
+    src_transformer
+    ${TORCH_LIBRARIES}
+)
+
+# add_custom_command(
+#     TARGET ${CMAKE_PROJECT_NAME}
+#     POST_BUILD
+#     COMMAND ${CMAKE_COMMAND} -E
+#     copy_directory
+#     ${DEPENDENCY_PATH}
+#     "$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>"
+# )
+
+add_custom_command(
+    TARGET ${CMAKE_PROJECT_NAME}
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E
+    copy_directory_if_different
+    ${DEPENDENCY_PATH}
+    "$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>"
+)
+
+if (MSVC)
+  file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
+  add_custom_command(TARGET ${CMAKE_PROJECT_NAME}
+                     POST_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                     ${TORCH_DLLS}
+                     $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>)
+endif (MSVC)

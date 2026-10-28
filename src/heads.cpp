@@ -1,4 +1,4 @@
-# include <heads.h>
+#include <heads.h>
 
 HeadsImpl :: HeadsImpl(const std::shared_ptr<TransformerConfig>& config){
 
@@ -48,3 +48,14 @@ torch::Tensor HeadsImpl :: forward(torch::Tensor& input){
     return index;
 
 }
+
+/**
+ * @note
+ * The posible scenarios in here are
+ * 1. during training:
+ * case 1:
+ * The input might be of 1x1x4 that is one batch one embeddings or an attention output. 
+ * so it should take the embeddings pass it through the prediction heads which will give the probability of the next possible token
+ * case 2:
+ * The input might be of 1x4x4 in that case the heads should 
+ */

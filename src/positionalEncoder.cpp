@@ -34,6 +34,10 @@ torch::Tensor PositionalEncoder::EncodePosition(const int& no_of_tokens, const i
 
     token_no--;
 
+    DEBUG("NO OF TOKENS, DIMENSION");
+    DEBUG(no_of_tokens);
+    DEBUG(embedding_dim);
+
     position = (token_no > 0)? torch::tensor({token_no}).unsqueeze(1) : torch::arange(no_of_tokens).unsqueeze(1); // 3x1
 
     pe_table = (token_no > 0)? torch::ones({embedding_dim}).unsqueeze(0) : torch::ones({no_of_tokens, embedding_dim}); // 3x3
