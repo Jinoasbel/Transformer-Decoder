@@ -8,13 +8,20 @@ set(DEPENDENCY_PATH "D:/Library/libtorch/lib")
 
 set(LIB_NAME "TRANSFORMER_DECODER")
 
+math(EXPR Arch "${CMAKE_SIZEOF_VOID_P} * 8")
+set(Dir "${CMAKE_BINARY_DIR}/$<CONFIG>/${CMAKE_SYSTEM_NAME}/${Arch}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${Dir}/bin")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${Dir}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${Dir}/lib")
+
 find_package(
     torch
     REQUIRED
 )
 
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 add_library(
     ${LIB_NAME}
